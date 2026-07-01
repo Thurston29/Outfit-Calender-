@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#15171C" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Daily Fit" />
+<title>Daily Fit</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%2315171C'/%3E%3Cpath d='M30,24 L21,31 L15,42 L25,47 L29,43 L29,80 L71,80 L71,43 L75,47 L85,42 L79,31 L70,24 C64,30 56,32 50,32 C44,32 36,30 30,24 Z' fill='%23E6A15A'/%3E%3C/svg%3E" />
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: #15171C; color: #EDEBE4;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
+  button { font-family: inherit; cursor: pointer; }
+  #app { max-width: 460px; margin: 0 auto; padding: 20px 16px calc(96px + env(safe-area-inset-bottom)); }
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  .nav { position: fixed; left: 0; right: 0; bottom: 0; background: #16181D;
+    border-top: 1px solid #2C303A; display: flex; justify-content: center;
+    padding: 8px 8px calc(14px + env(safe-area-inset-bottom)); z-index: 10; }
+  .navInner { display: flex; width: 100%; max-width: 460px; justify-content: space-around; }
+  .navBtn { background: none; border: none; display: flex; flex-direction: column;
+    align-items: center; gap: 3px; padding: 4px 14px; position: relative; }
+  .navBtn span { font-size: 10.5px; font-weight: 600; }
+  .badge { position: absolute; top: -2px; right: 6px; background: #E6A15A; color: #15171C;
+    font-size: 9px; font-weight: 800; border-radius: 99px; min-width: 15px; height: 15px;
+    display: flex; align-items: center; justify-content: center; padding: 0 3px; }
+  .card { background: #1E2129; border: 1px solid #2C303A; border-radius: 22px; }
+  .stepBtn { background: #23262F; color: #EDEBE4; border: 1px solid #2C303A; border-radius: 12px;
+    height: 44px; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+  .gcell { background: transparent; border: 1px solid transparent; border-radius: 10px;
+    padding: 5px 0 4px; display: flex; flex-direction: column; align-items: center; gap: 3px; position: relative; }
+  h2 { margin: 0 0 4px; font-size: 22px; font-weight: 800; }
+  .sub { margin: 0 0 18px; font-size: 13px; color: #868C97; line-height: 1.5; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="nav"><div class="navInner" id="nav"></div></div>
+
+<script>
+"use strict";
+var COLORS = [
+  { name: "Blue",  hex: "#3B6DD1" },
+  { name: "White", hex: "#F4F1E8" },
+  { name: "Green", hex: "#2F9E5B" },
+  { name: "Black", hex: "#26262B" },
+  { name: "Brown", hex: "#7A4E2E" }
+];
+var INK="#15171C", CARD="#1E2129", CARD2="#23262F", TEXT="#EDEBE4", MUTE="#868C97", LINE="#2C303A", AMBER="#E6A15A";
+
+var SEQ = [[0,0,0],[4,1,4],[2,2,3],[1,3,1],[3,4,2],[4,0,4],[3,2,2],[1,3,3],[0,4,0],[1,1,1],[2,3,3],[0,4,2],[4,1,1],[3,0,4],[2,2,0],[3,0,2],[0,2,0],[1,4,1],[4,3,3],[0,0,4],[2,1,1],[1,4,2],[4,3,4],[3,2,0],[2,1,3],[0,0,2],[4,3,1],[3,2,3],[1,4,0],[2,1,4],[1,4,3],[2,0,4],[0,2,2],[4,3,0],[3,1,1],[1,4,4],[2,2,2],[4,1,3],[3,0,0],[0,1,1],[4,3,2],[2,2,4],[3,4,0],[0,0,1],[1,1,3],[2,3,4],[1,2,3],[3,0,1],[4,4,2],[0,3,0],[1,0,1],[2,4,2],[3,1,3],[2,3,0],[1,0,4],[4,2,3],[0,3,1],[4,2,2],[2,4,4],[0,1,0],[3,0,3],[4,1,2],[0,4,1],[1,3,0],[3,2,4],[2,3,1],[1,0,3],[4,2,4],[0,1,2],[2,4,0],[3,1,2],[4,2,0],[1,3,4],[0,0,3],[2,4,1],[3,1,0],[2,4,3],[0,3,2],[1,2,4],[4,0,1],[3,3,0],[4,0,3],[1,1,4],[3,4,1],[4,0,2],[3,1,4],[1,2,0],[0,3,3],[2,1,2],[4,4,1],[0,2,3],[2,3,2],[0,2,4],[1,0,0],[3,4,4],[0,1,3],[4,0,0],[3,3,1],[1,2,2],[2,1,0],[4,4,4],[2,0,1],[0,4,3],[3,3,2],[1,2,1],[2,0,3],[1,3,2],[4,4,0],[0,1,4],[3,2,1],[4,4,3],[2,0,0],[1,1,2],[0,3,4],[3,4,3],[0,2,1],[1,0,2],[4,2,1],[3,3,4],[2,2,1],[4,1,0],[2,0,2],[0,4,4],[1,1,0],[3,3,3]];
+var CYCLE = SEQ.length;
+var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+var DOWF = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+var DOWS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+var DOW = ["S","M","T","W","T","F","S"];
+var STORE_KEY = "msms_outfit_favs_v2";
+
+function dayOfYear(d){ var s=new Date(d.getFullYear(),0,0); return Math.floor((d-s)/86400000); }
+function outfitIndex(d){ return (dayOfYear(d)-1)%CYCLE; }
+function sameDay(a,b){ return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate(); }
+function fmt(d){ return DOWF[d.getDay()]+", "+MONTHS[d.getMonth()]+" "+d.getDate(); }
+function fmtShort(d){ return DOWS[d.getDay()]+", "+MONTHS[d.getMonth()].slice(0,3)+" "+d.getDate(); }
+function iso(d){ return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); }
+function parseIso(s){ var p=s.split("-"); return new Date(+p[0], +p[1]-1, +p[2]); }
+function pad(n,w){ n=String(n); while(n.length<w) n="0"+n; return n; }
+
+function stroke(c){ return c===1 ? "#CFCABB" : c===3 ? "#5A5A64" : "rgba(0,0,0,0.20)"; }
+function dotShadow(c){ return c===1 ? "inset 0 0 0 1px #CFCABB" : c===3 ? "inset 0 0 0 1px #5A5A64" : "none"; }
+
+function tee(c,s){ return "<svg width='"+s+"' height='"+s+"' viewBox='0 0 100 100'><path d='M30,20 L20,28 L13,41 L24,47 L28,43 L28,82 L72,82 L72,43 L76,47 L87,41 L80,28 L70,20 C64,27 56,29 50,29 C44,29 36,27 30,20 Z' fill='"+COLORS[c].hex+"' stroke='"+stroke(c)+"' stroke-width='1.5' stroke-linejoin='round'/></svg>"; }
+function pants(c,s){ return "<svg width='"+s+"' height='"+s+"' viewBox='0 0 100 100'><path d='M28,16 L72,16 L69,86 L53,86 L50,44 L47,86 L31,86 Z' fill='"+COLORS[c].hex+"' stroke='"+stroke(c)+"' stroke-width='1.5' stroke-linejoin='round'/></svg>"; }
+function shoe(c,s){ return "<svg width='"+s+"' height='"+s+"' viewBox='0 0 100 100'><path d='M12,60 C12,50 22,46 34,46 L52,48 C60,49 66,53 79,58 C87,60 90,64 90,69 L90,73 L12,73 Z' fill='"+COLORS[c].hex+"' stroke='"+stroke(c)+"' stroke-width='1.5' stroke-linejoin='round'/><path d='M34,46 L36,58 M45,47 L47,59 M56,49 L57,60' stroke='"+stroke(c)+"' stroke-width='1.3' fill='none'/></svg>"; }
+function heart(f,s){ return "<svg width='"+s+"' height='"+s+"' viewBox='0 0 24 24'><path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z' fill='"+(f?AMBER:"none")+"' stroke='"+(f?AMBER:MUTE)+"' stroke-width='1.8'/></svg>"; }
+function dot(c){ return "<span style='width:7px;height:7px;border-radius:99px;background:"+COLORS[c].hex+";box-shadow:"+dotShadow(c)+";display:inline-block'></span>"; }
+
+function outfitRow(o, size){
+  var parts = [["Top", tee, o[0]], ["Pants", pants, o[1]], ["Shoes", shoe, o[2]]];
+  var big = size>70;
+  var h = "<div style='display:flex;justify-content:space-around;align-items:flex-end'>";
+  for (var i=0;i<3;i++){
+    var p=parts[i];
+    h += "<div style='text-align:center'>"+p[1](p[2],size)+
+      "<div style='margin-top:3px;font-size:"+(big?12:10)+"px;font-weight:700;color:"+TEXT+"'>"+COLORS[p[2]].name+"</div>"+
+      "<div style='font-size:9px;letter-spacing:1.4px;text-transform:uppercase;color:"+MUTE+"'>"+p[0]+"</div></div>";
+  }
+  return h+"</div>";
+}
+
+// ---------- state ----------
+var today = new Date(); today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+var state = { tab:"today", sel:new Date(today), favs:loadFavs() };
+
+function loadFavs(){ try{ var v=localStorage.getItem(STORE_KEY); return v?JSON.parse(v):[]; }catch(e){ return []; } }
+function saveFavs(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state.favs)); }catch(e){} }
+function isFav(i){ return state.favs.indexOf(i)>=0; }
+function toggleFav(i){ if(isFav(i)) state.favs=state.favs.filter(function(x){return x!==i;}); else { state.favs.push(i); state.favs.sort(function(a,b){return a-b;}); } saveFavs(); render(); }
+function nextDateFor(k){ for(var a=0;a<CYCLE;a++){ var d=new Date(today.getFullYear(),today.getMonth(),today.getDate()+a); if(outfitIndex(d)===k) return d; } return today; }
+
+// ---------- views ----------
+function todayView(){
+  var sel=state.sel, idx=outfitIndex(sel), isT=sameDay(sel,today), o=SEQ[idx];
+  var y=sel.getFullYear(), m=sel.getMonth();
+  var firstDow=new Date(y,m,1).getDay(), dim=new Date(y,m+1,0).getDate();
+
+  var h = "<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:16px'>"+
+    "<span style='font-size:11px;letter-spacing:2px;text-transform:uppercase;color:"+MUTE+";font-weight:600'>"+(isT?"Today you wear":"You wear")+"</span>"+
+    "<span class='mono' style='font-size:11px;color:"+MUTE+"'>#"+pad(idx+1,3)+" / "+CYCLE+"</span></div>";
+
+  h += "<div class='card' style='padding:22px 18px 20px;box-shadow:0 12px 40px rgba(0,0,0,0.35)'>"+
+    "<div style='display:flex;justify-content:space-between;align-items:flex-start'>"+
+    "<div><div class='mono' style='font-size:14px;color:"+(isT?AMBER:MUTE)+";font-weight:600'>"+(isT?"TODAY":fmtShort(sel).toUpperCase())+"</div>"+
+    "<div style='font-size:12px;color:"+MUTE+";margin-top:3px'>"+fmt(sel)+"</div></div>"+
+    "<button data-act='fav' data-i='"+idx+"' style='background:none;border:none;padding:4px'>"+heart(isFav(idx),28)+"</button></div>"+
+    "<div style='padding:16px 0 4px'>"+outfitRow(o,88)+"</div>"+
+    (isFav(idx)?"<div style='text-align:center;font-size:11px;color:"+AMBER+";margin-top:4px'>\u2605 One of your favourites</div>":"")+
+    "</div>";
+
+  h += "<div style='display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:8px;margin-top:14px'>"+
+    "<button class='stepBtn' data-act='shift' data-n='-1'>\u2039</button>"+
+    "<button class='stepBtn' data-act='today' style='font-size:13px;letter-spacing:1px;font-weight:700;color:"+(isT?MUTE:AMBER)+";border-color:"+(isT?LINE:AMBER)+"'>"+(isT?"TODAY":"JUMP TO TODAY")+"</button>"+
+    "<button class='stepBtn' data-act='shift' data-n='1'>\u203A</button></div>";
+
+  // month grid
+  h += "<div style='margin-top:24px'><div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:12px'>"+
+    "<button class='stepBtn' data-act='month' data-n='-1' style='width:40px;height:32px;font-size:16px'>\u2039</button>"+
+    "<span style='font-size:14px;font-weight:700'>"+MONTHS[m]+" "+y+"</span>"+
+    "<button class='stepBtn' data-act='month' data-n='1' style='width:40px;height:32px;font-size:16px'>\u203A</button></div>";
+  h += "<div style='display:grid;grid-template-columns:repeat(7,1fr);gap:6px'>";
+  for (var w=0;w<7;w++) h += "<div style='text-align:center;font-size:10px;color:"+MUTE+";font-weight:600'>"+DOW[w]+"</div>";
+  for (var b=0;b<firstDow;b++) h += "<div></div>";
+  for (var d=1;d<=dim;d++){
+    var cd=new Date(y,m,d), k=outfitIndex(cd);
+    var selHere=sameDay(cd,sel), todayHere=sameDay(cd,today), favHere=isFav(k);
+    var bg = selHere?CARD2:(favHere?"rgba(230,161,90,0.10)":"transparent");
+    var bd = selHere?AMBER:"transparent";
+    h += "<button class='gcell' data-act='sel' data-d='"+iso(cd)+"' style='background:"+bg+";border-color:"+bd+"'>"+
+      "<span style='font-size:12px;font-weight:600;color:"+(todayHere?AMBER:TEXT)+"'>"+d+"</span>"+
+      "<span style='display:flex;gap:2px'>"+dot(SEQ[k][0])+dot(SEQ[k][1])+dot(SEQ[k][2])+"</span>"+
+      (favHere?"<span style='position:absolute;top:2px;right:3px;font-size:8px;color:"+AMBER+"'>\u2665</span>":"")+"</button>";
+  }
+  h += "</div><div style='margin-top:12px;font-size:11px;color:"+MUTE+";text-align:center;line-height:1.5'>Dots: top \u00B7 pants \u00B7 shoes. Tap the \u2665 on any outfit to save it.</div></div>";
+  return h;
+}
+
+function galleryView(){
+  var h = "<h2>The full cycle</h2><p class='sub'>All "+CYCLE+" outfits, in order \u2014 15 pieces across 5 colours. Every piece changes colour day to day. Tap a heart to save.</p>";
+  h += "<div style='display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px'>";
+  for (var i=0;i<CYCLE;i++){
+    var o=SEQ[i], f=isFav(i);
+    h += "<div class='card' style='border-radius:16px;padding:10px;border-color:"+(f?AMBER:LINE)+"'>"+
+      "<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:4px'>"+
+      "<span class='mono' style='font-size:12px;font-weight:700;color:"+AMBER+"'>Day "+(i+1)+"</span>"+
+      "<button data-act='fav' data-i='"+i+"' style='background:none;border:none;padding:2px'>"+heart(f,20)+"</button></div>"+
+      outfitRow(o,46)+"</div>";
+  }
+  return h+"</div>";
+}
+
+function favView(){
+  var h = "<h2>Favourites</h2><p class='sub'>Your go-to looks. Each shows the next day it naturally comes around.</p>";
+  if (state.favs.length===0){
+    return h+"<div class='card' style='border-style:dashed;border-radius:18px;padding:38px 20px;text-align:center'>"+
+      "<div style='margin-bottom:10px;display:flex;justify-content:center'>"+heart(false,30)+"</div>"+
+      "<div style='font-size:14px;font-weight:700'>No favourites yet</div>"+
+      "<div style='font-size:12.5px;color:"+MUTE+";margin-top:6px;line-height:1.5'>Tap the heart on any outfit in Today or Gallery and it'll land here.</div></div>";
+  }
+  h += "<div style='display:flex;flex-direction:column;gap:12px'>";
+  for (var j=0;j<state.favs.length;j++){
+    var i=state.favs[j], nd=nextDateFor(i), isT=sameDay(nd,today);
+    h += "<div class='card' style='border-radius:18px;padding:14px 16px'>"+
+      "<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:8px'>"+
+      "<span class='mono' style='font-size:12px;font-weight:700;color:"+AMBER+"'>Day "+(i+1)+" \u00B7 #"+pad(i+1,3)+"</span>"+
+      "<button data-act='fav' data-i='"+i+"' style='background:none;border:none;padding:2px'>"+heart(true,22)+"</button></div>"+
+      outfitRow(SEQ[i],60)+
+      "<div style='margin-top:12px;padding-top:10px;border-top:1px solid "+LINE+";display:flex;justify-content:space-between;align-items:center'>"+
+      "<span style='font-size:12px;color:"+MUTE+"'>Wear it next</span>"+
+      "<button data-act='favnext' data-d='"+iso(nd)+"' style='background:"+CARD2+";color:"+AMBER+";border:1px solid "+LINE+";border-radius:10px;padding:6px 12px;font-size:12.5px;font-weight:700'>"+(isT?"Today \u2192":fmtShort(nd)+" \u2192")+"</button></div></div>";
+  }
+  return h+"</div>";
+}
+
+function navView(){
+  var tabs=[["today","Today"],["gallery","Gallery"],["favs","Favourites"]];
+  function ico(key,a){
+    var col=a?AMBER:MUTE;
+    if(key==="today") return "<svg width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='"+col+"' stroke-width='2'><rect x='3' y='4' width='18' height='17' rx='2'/><path d='M3 9h18M8 2v4M16 2v4'/></svg>";
+    if(key==="gallery") return "<svg width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='"+col+"' stroke-width='2'><rect x='3' y='3' width='7' height='7' rx='1.5'/><rect x='14' y='3' width='7' height='7' rx='1.5'/><rect x='3' y='14' width='7' height='7' rx='1.5'/><rect x='14' y='14' width='7' height='7' rx='1.5'/></svg>";
+    return heart(a,22);
+  }
+  var h="";
+  for (var i=0;i<tabs.length;i++){
+    var key=tabs[i][0], a=state.tab===key;
+    h += "<button class='navBtn' data-act='tab' data-tab='"+key+"'>"+ico(key,a)+
+      "<span style='color:"+(a?AMBER:MUTE)+"'>"+tabs[i][1]+"</span>"+
+      (key==="favs"&&state.favs.length>0?"<span class='badge'>"+state.favs.length+"</span>":"")+"</button>";
+  }
+  return h;
+}
+
+function render(){
+  var app=document.getElementById("app");
+  app.innerHTML = state.tab==="today"?todayView():state.tab==="gallery"?galleryView():favView();
+  document.getElementById("nav").innerHTML = navView();
+  if (state.tab!=="gallery") window.scrollTo(0,0);
+}
+
+document.addEventListener("click", function(e){
+  var t=e.target.closest("[data-act]"); if(!t) return;
+  var act=t.getAttribute("data-act");
+  if(act==="tab"){ state.tab=t.getAttribute("data-tab"); render(); }
+  else if(act==="fav"){ toggleFav(+t.getAttribute("data-i")); }
+  else if(act==="shift"){ var n=+t.getAttribute("data-n"); state.sel=new Date(state.sel.getFullYear(),state.sel.getMonth(),state.sel.getDate()+n); render(); }
+  else if(act==="today"){ state.sel=new Date(today); render(); }
+  else if(act==="month"){ var mm=+t.getAttribute("data-n"); state.sel=new Date(state.sel.getFullYear(),state.sel.getMonth()+mm,1); render(); }
+  else if(act==="sel"){ state.sel=parseIso(t.getAttribute("data-d")); render(); }
+  else if(act==="favnext"){ state.sel=parseIso(t.getAttribute("data-d")); state.tab="today"; render(); }
+});
+
+render();
+</script>
+</body>
+</html>
